@@ -35,7 +35,9 @@ class MySQLDatabase {
 
     // Функция для получения последней ошибки базы данных
     public function get_error() {
-        return $this->err;
+        $err = $this->err;
+        $this->err = null;
+        return $err;
     }
 
     // Функция для выполнения произвольного SQL-запроса (значения параметров должны передаваться, только через params)

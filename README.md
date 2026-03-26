@@ -96,15 +96,31 @@ require_once __DIR__ . "/db/db.php";
 
 $db = new MySQLDatabase("my_database", "root", "password");
 
-$db->insert("users", [
+$insert_id = $db->insert("users", [
     "email" => "user@example.com",
     "name" => "Alex"
 ]);
 
-$user = $db->get_row("users", ["id", "email", "name"], "id = ?", [1]);
+if ($insert_id === false) {
+    $error = $db->get_error();
+
+    if ($error !== null) {
+        echo $error;
+    }
+
+    exit;
+}
+
+$user = $db->get_row("users", ["id", "email", "name"], "id = ?", [$insert_id]);
 
 if ($user === false) {
-    echo $db->get_error();
+    $error = $db->get_error();
+
+    if ($error !== null) {
+        echo $error;
+    } else {
+        echo "User not found";
+    }
 } else {
     var_dump($user);
 }
@@ -116,6 +132,7 @@ if ($user === false) {
 - Имена таблиц и колонок валидируются отдельно
 - Методы чтения возвращают массивы данных, а методы изменения данных возвращают `insert id` или количество затронутых строк
 - При ошибке методы возвращают `false`, а для ошибок соединения и выполнения запроса можно дополнительно проверить `get_error()`
+- `get_error()` возвращает текущую ошибку и сразу очищает её, поэтому в коде лучше вызывать этот метод один раз и сохранять результат в переменную
 
 ## Структура проекта
 
